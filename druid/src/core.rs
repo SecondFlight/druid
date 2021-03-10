@@ -837,11 +837,11 @@ impl<T: Data, W: Widget<T>> WidgetPod<T, W> {
             notifications: parent_notifications,
             ..
         } = ctx;
-        let mut sentinal = VecDeque::new();
+        let mut notifications_added_in_response_to_these = VecDeque::new();
         let self_id = self.id();
         let mut inner_ctx = EventCtx {
             state,
-            notifications: &mut sentinal,
+            notifications: &mut notifications_added_in_response_to_these,
             widget_state: &mut self.state,
             is_handled: false,
             is_root: false,
@@ -866,12 +866,7 @@ impl<T: Data, W: Widget<T>> WidgetPod<T, W> {
             }
         }
 
-        if !inner_ctx.notifications.is_empty() {
-            tracing::warn!(
-                "A Notification was submitted while handling another \
-            notification; the submitted notification will be ignored."
-            );
-        }
+        parent_notifications.extend(notifications_added_in_response_to_these);
     }
 
     /// Propagate a [`LifeCycle`] event.
