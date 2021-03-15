@@ -846,10 +846,11 @@ impl<T: Data, W: Widget<T>> WidgetPod<T, W> {
             notifications: parent_notifications,
             ..
         } = ctx;
-        let mut sentinal = VecDeque::new();
+        let mut notifications_added_in_response_to_these = VecDeque::new();
+        let self_id = self.id();
         let mut inner_ctx = EventCtx {
             state,
-            notifications: &mut sentinal,
+            notifications: &mut notifications_added_in_response_to_these,
             widget_state: &mut self.state,
             is_handled: false,
             is_root: false,
@@ -857,24 +858,24 @@ impl<T: Data, W: Widget<T>> WidgetPod<T, W> {
 
         for _ in 0..notifications.len() {
             let notification = notifications.pop_front().unwrap();
-            let event = Event::Notification(notification);
-            self.inner.event(&mut inner_ctx, &event, data, env);
-            if inner_ctx.is_handled {
-                inner_ctx.is_handled = false;
-            } else if let Event::Notification(notification) = event {
-                // we will try again with the next parent
-                parent_notifications.push_back(notification);
+            // skip notifications that were submitted by our child
+            if notification.source() != self_id {
+                let event = Event::Notification(notification);
+                self.inner.event(&mut inner_ctx, &event, data, env);
+                if inner_ctx.is_handled {
+                    inner_ctx.is_handled = false;
+                } else if let Event::Notification(notification) = event {
+                    // we will try again with the next parent
+                    parent_notifications.push_back(notification);
+                } else {
+                    unreachable!()
+                }
             } else {
-                unreachable!()
+                parent_notifications.push_back(notification);
             }
         }
 
-        if !inner_ctx.notifications.is_empty() {
-            warn!(
-                "A Notification was submitted while handling another \
-            notification; the submitted notification will be ignored."
-            );
-        }
+        parent_notifications.extend(notifications_added_in_response_to_these);
     }
 
     /// Propagate a [`LifeCycle`] event.

@@ -24,6 +24,7 @@ You can find its changes [documented below](#070---2021-01-01).
 - Shell: IME API and macOS IME implementation ([#1619] by [@lord])
 - Scroll::content_must_fill and a few other new Scroll methods ([#1635] by [@cmyr])
 - Added ListIter implementations for OrdMap ([#1641] by [@Lejero])
+- `Notification`s can be submitted while handling other `Notification`s ([#1640] by [@cmyr])
 
 ### Changed
 
@@ -38,6 +39,8 @@ You can find its changes [documented below](#070---2021-01-01).
 ### Removed
 
 ### Fixed
+- `Notification`s will not be delivered to the widget that sends them ([#1640] by [@cmyr])
+
 
 - Fixed docs of derived Lens ([#1523] by [@Maan2003])
 - Use correct fill rule when rendering SVG paths ([#1606] by [@SecondFlight])
