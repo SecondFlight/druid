@@ -99,7 +99,6 @@ version = "0.3.44"
 features = ["Window", "MouseEvent", "CssStyleDeclaration", "WheelEvent", "KeyEvent", "KeyboardEvent"]
 
 [dev-dependencies]
-piet-common = { git = "https://github.com/SecondFlight/piet.git", branch = "rounded-rect-corners", features = ["png"] }
 piet-common = { version = "=0.4.1", features = ["png"] }
 static_assertions = "1.1.0"
 test-env-log = { version = "0.2.5", features = ["trace"], default-features = false }
